@@ -7,10 +7,13 @@ import com.google.common.base.Optional;
 import com.zenika.zencontact.domain.User;
 import com.zenika.zencontact.domain.blob.PhotoService;
 import com.zenika.zencontact.persistence.objectify.UserDaoObjectify;
+import com.zenika.zencontact.resource.fetch.PartnerBirthdayService;
 import restx.annotations.*;
 import restx.factory.Component;
 import restx.security.PermitAll;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -72,7 +75,18 @@ public class UserObjectifyResource {
     @PermitAll
     public User storeUser(final User user) {
         cache.delete(USERS_KEY);
+
+        String bithdate = PartnerBirthdayService.getInstance().findBirthdata(user.firstName, user.lastName);
+        if(bithdate != null) {
+            try {
+                user.birthdate(new SimpleDateFormat("yyyy-MM-dd").parse(bithdate));
+            } catch (ParseException e) {
+                LOG.severe(e.getMessage());
+            }
+        }
+
         user.id(UserDaoObjectify.getInstance().save(user));
+
         return user;
     }
 }
