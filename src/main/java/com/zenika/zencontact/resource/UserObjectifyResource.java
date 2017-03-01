@@ -56,6 +56,7 @@ public class UserObjectifyResource {
     public Optional<User> updateUser(final Long id, final User user) {
         long key = UserDaoObjectify.getInstance().save(user);
         user.id = key;
+        cache.delete(USERS_KEY);
         return Optional.fromNullable(user);
     }
 
