@@ -54,9 +54,9 @@ public class UserObjectifyResource {
     @PUT("/v2/users/{id}")
     @PermitAll
     public Optional<User> updateUser(final Long id, final User user) {
+        cache.delete(USERS_KEY);
         long key = UserDaoObjectify.getInstance().save(user);
         user.id = key;
-        cache.delete(USERS_KEY);
         return Optional.fromNullable(user);
     }
 
@@ -71,6 +71,7 @@ public class UserObjectifyResource {
     @POST("/v2/users")
     @PermitAll
     public User storeUser(final User user) {
+        cache.delete(USERS_KEY);
         user.id(UserDaoObjectify.getInstance().save(user));
         return user;
     }
